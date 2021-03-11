@@ -51,6 +51,7 @@ systemd:
         Wants=rpc-statd.service
         [Service]
         Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.4
+        Environment=PAUSE_IMAGE=k8s.gcr.io/pause:3.4.1
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/cni/net.d
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
         ExecStartPre=/bin/mkdir -p /opt/cni/bin
@@ -92,6 +93,7 @@ systemd:
           --network-plugin=cni \
           --node-labels=node.kubernetes.io/controller="true" \
           --pod-manifest-path=/etc/kubernetes/manifests \
+          --pod-infra-container-image=$${PAUSE_IMAGE} \
           --read-only-port=0 \
           --register-with-taints=node-role.kubernetes.io/controller=:NoSchedule \
           --rotate-certificates \
@@ -120,6 +122,7 @@ systemd:
         Type=oneshot
         RemainAfterExit=true
         WorkingDirectory=/opt/bootstrap
+        Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.4
         ExecStartPre=-/usr/bin/podman rm bootstrap
         ExecStart=/usr/bin/podman run --name bootstrap \
             --network host \
@@ -127,7 +130,7 @@ systemd:
             --volume /opt/bootstrap/assets:/assets:ro,Z \
             --volume /opt/bootstrap/apply:/apply:ro,Z \
             --entrypoint=/apply \
-            quay.io/poseidon/kubelet:v1.20.4
+            $${KUBELET_IMAGE}
         ExecStartPost=/bin/touch /opt/bootstrap/bootstrap.done
         ExecStartPost=-/usr/bin/podman stop bootstrap
 storage:
@@ -140,8 +143,7 @@ storage:
     - path: /etc/hostname
       mode: 0644
       contents:
-        inline:
-          ${domain_name}
+        inline: ${domain_name}
     - path: /opt/bootstrap/layout
       mode: 0544
       contents:

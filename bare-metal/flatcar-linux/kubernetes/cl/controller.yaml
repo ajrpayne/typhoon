@@ -64,6 +64,7 @@ systemd:
         Wants=rpc-statd.service
         [Service]
         Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.4
+        Environment=PAUSE_IMAGE=k8s.gcr.io/pause:3.4.1
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/cni/net.d
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
         ExecStartPre=/bin/mkdir -p /opt/cni/bin
@@ -102,6 +103,7 @@ systemd:
           --network-plugin=cni \
           --node-labels=node.kubernetes.io/controller="true" \
           --pod-manifest-path=/etc/kubernetes/manifests \
+          --pod-infra-container-image=$${PAUSE_IMAGE} \
           --read-only-port=0 \
           --register-with-taints=node-role.kubernetes.io/controller=:NoSchedule \
           --rotate-certificates \
@@ -148,8 +150,7 @@ storage:
       filesystem: root
       mode: 0644
       contents:
-        inline:
-          ${domain_name}
+        inline: ${domain_name}
     - path: /opt/bootstrap/layout
       filesystem: root
       mode: 0544
@@ -198,24 +199,24 @@ storage:
       filesystem: root
       mode: 0644
       contents:
-          inline: |
-            ETCD_NAME=${etcd_name}
-            ETCD_DATA_DIR=/var/lib/etcd
-            ETCD_ADVERTISE_CLIENT_URLS=https://${domain_name}:2379
-            ETCD_INITIAL_ADVERTISE_PEER_URLS=https://${domain_name}:2380
-            ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-            ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
-            ETCD_LISTEN_METRICS_URLS=http://0.0.0.0:2381
-            ETCD_INITIAL_CLUSTER=${etcd_initial_cluster}
-            ETCD_STRICT_RECONFIG_CHECK=true
-            ETCD_TRUSTED_CA_FILE=/etc/ssl/certs/etcd/server-ca.crt
-            ETCD_CERT_FILE=/etc/ssl/certs/etcd/server.crt
-            ETCD_KEY_FILE=/etc/ssl/certs/etcd/server.key
-            ETCD_CLIENT_CERT_AUTH=true
-            ETCD_PEER_TRUSTED_CA_FILE=/etc/ssl/certs/etcd/peer-ca.crt
-            ETCD_PEER_CERT_FILE=/etc/ssl/certs/etcd/peer.crt
-            ETCD_PEER_KEY_FILE=/etc/ssl/certs/etcd/peer.key
-            ETCD_PEER_CLIENT_CERT_AUTH=true
+        inline: |
+          ETCD_NAME=${etcd_name}
+          ETCD_DATA_DIR=/var/lib/etcd
+          ETCD_ADVERTISE_CLIENT_URLS=https://${domain_name}:2379
+          ETCD_INITIAL_ADVERTISE_PEER_URLS=https://${domain_name}:2380
+          ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+          ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+          ETCD_LISTEN_METRICS_URLS=http://0.0.0.0:2381
+          ETCD_INITIAL_CLUSTER=${etcd_initial_cluster}
+          ETCD_STRICT_RECONFIG_CHECK=true
+          ETCD_TRUSTED_CA_FILE=/etc/ssl/certs/etcd/server-ca.crt
+          ETCD_CERT_FILE=/etc/ssl/certs/etcd/server.crt
+          ETCD_KEY_FILE=/etc/ssl/certs/etcd/server.key
+          ETCD_CLIENT_CERT_AUTH=true
+          ETCD_PEER_TRUSTED_CA_FILE=/etc/ssl/certs/etcd/peer-ca.crt
+          ETCD_PEER_CERT_FILE=/etc/ssl/certs/etcd/peer.crt
+          ETCD_PEER_KEY_FILE=/etc/ssl/certs/etcd/peer.key
+          ETCD_PEER_CLIENT_CERT_AUTH=true
 passwd:
   users:
     - name: core

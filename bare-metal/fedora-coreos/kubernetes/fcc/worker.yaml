@@ -24,6 +24,7 @@ systemd:
         Wants=rpc-statd.service
         [Service]
         Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.4
+        Environment=PAUSE_IMAGE=k8s.gcr.io/pause:3.4.1
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/cni/net.d
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
         ExecStartPre=/bin/mkdir -p /opt/cni/bin
@@ -71,6 +72,7 @@ systemd:
           --register-with-taints=${taint} \
           %{~ endfor ~}
           --pod-manifest-path=/etc/kubernetes/manifests \
+          --pod-infra-container-image=$${PAUSE_IMAGE} \
           --read-only-port=0 \
           --rotate-certificates \
           --volume-plugin-dir=/var/lib/kubelet/volumeplugins
@@ -96,8 +98,7 @@ storage:
     - path: /etc/hostname
       mode: 0644
       contents:
-        inline:
-          ${domain_name}
+        inline: ${domain_name}
     - path: /etc/sysctl.d/max-user-watches.conf
       contents:
         inline: |
@@ -126,4 +127,3 @@ passwd:
     - name: core
       ssh_authorized_keys:
         - ${ssh_authorized_key}
-
