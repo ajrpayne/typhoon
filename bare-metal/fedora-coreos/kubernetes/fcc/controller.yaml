@@ -50,7 +50,7 @@ systemd:
         Description=Kubelet (System Container)
         Wants=rpc-statd.service
         [Service]
-        Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.4
+        Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.5
         Environment=PAUSE_IMAGE=k8s.gcr.io/pause:3.4.1
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/cni/net.d
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
@@ -122,7 +122,7 @@ systemd:
         Type=oneshot
         RemainAfterExit=true
         WorkingDirectory=/opt/bootstrap
-        Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.4
+        Environment=KUBELET_IMAGE=quay.io/poseidon/kubelet:v1.20.5
         ExecStartPre=-/usr/bin/podman rm bootstrap
         ExecStart=/usr/bin/podman run --name bootstrap \
             --network host \
