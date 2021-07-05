@@ -48,13 +48,13 @@ variable "os_image" {
 variable "disk_size" {
   type        = number
   description = "Size of the EBS volume in GB"
-  default     = 40
+  default     = 30
 }
 
 variable "disk_type" {
   type        = string
-  description = "Type of the EBS volume (e.g. standard, gp2, io1)"
-  default     = "gp2"
+  description = "Type of the EBS volume (e.g. standard, gp2, gp3, io1)"
+  default     = "gp3"
 }
 
 variable "disk_iops" {
@@ -111,5 +111,11 @@ variable "cluster_domain_suffix" {
 variable "node_labels" {
   type        = list(string)
   description = "List of initial node labels"
+  default     = []
+}
+
+variable "node_taints" {
+  type        = list(string)
+  description = "List of initial node taints"
   default     = []
 }

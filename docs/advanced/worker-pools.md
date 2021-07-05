@@ -19,7 +19,7 @@ Create a cluster following the AWS [tutorial](../flatcar-linux/aws.md#cluster). 
 
     ```tf
     module "tempest-worker-pool" {
-      source = "git::https://github.com/poseidon/typhoon//aws/fedora-coreos/kubernetes/workers?ref=v1.20.5"
+      source = "git::https://github.com/poseidon/typhoon//aws/fedora-coreos/kubernetes/workers?ref=v1.21.2"
 
       # AWS
       vpc_id          = module.tempest.vpc_id
@@ -42,7 +42,7 @@ Create a cluster following the AWS [tutorial](../flatcar-linux/aws.md#cluster). 
 
     ```tf
     module "tempest-worker-pool" {
-      source = "git::https://github.com/poseidon/typhoon//aws/flatcar-linux/kubernetes/workers?ref=v1.20.5"
+      source = "git::https://github.com/poseidon/typhoon//aws/flatcar-linux/kubernetes/workers?ref=v1.21.2"
 
       # AWS
       vpc_id          = module.tempest.vpc_id
@@ -93,12 +93,13 @@ The AWS internal `workers` module supports a number of [variables](https://githu
 | os_image | AMI channel for a Container Linux derivative | "flatcar-stable" | flatcar-stable, flatcar-beta, flatcar-alpha |
 | os_stream | Fedora CoreOS stream for compute instances | "stable" | "testing", "next" |
 | disk_size | Size of the EBS volume in GB | 40 | 100 |
-| disk_type | Type of the EBS volume | "gp2" | standard, gp2, io1 |
+| disk_type | Type of the EBS volume | "gp3" | standard, gp2, gp3, io1 |
 | disk_iops | IOPS of the EBS volume | 0 (i.e. auto) | 400 |
 | spot_price | Spot price in USD for worker instances or 0 to use on-demand instances | 0 | 0.10 |
 | snippets | Fedora CoreOS or Container Linux Config snippets | [] | [examples](/advanced/customization/) |
 | service_cidr | Must match `service_cidr` of cluster | "10.3.0.0/16" | "10.3.0.0/24" |
 | node_labels | List of initial node labels | [] | ["worker-pool=foo"] |
+| node_taints | List of initial node taints | [] | ["role=gpu:NoSchedule"] |
 
 Check the list of valid [instance types](https://aws.amazon.com/ec2/instance-types/) or per-region and per-type [spot prices](https://aws.amazon.com/ec2/spot/pricing/).
 
@@ -110,7 +111,7 @@ Create a cluster following the Azure [tutorial](../flatcar-linux/azure.md#cluste
 
     ```tf
     module "ramius-worker-pool" {
-      source = "git::https://github.com/poseidon/typhoon//azure/fedora-coreos/kubernetes/workers?ref=v1.20.5"
+      source = "git::https://github.com/poseidon/typhoon//azure/fedora-coreos/kubernetes/workers?ref=v1.21.2"
 
       # Azure
       region                  = module.ramius.region
@@ -136,7 +137,7 @@ Create a cluster following the Azure [tutorial](../flatcar-linux/azure.md#cluste
 
     ```tf
     module "ramius-worker-pool" {
-      source = "git::https://github.com/poseidon/typhoon//azure/flatcar-linux/kubernetes/workers?ref=v1.20.5"
+      source = "git::https://github.com/poseidon/typhoon//azure/flatcar-linux/kubernetes/workers?ref=v1.21.2"
 
       # Azure
       region                  = module.ramius.region
@@ -194,6 +195,7 @@ The Azure internal `workers` module supports a number of [variables](https://git
 | snippets | Container Linux Config snippets | [] | [examples](/advanced/customization/) |
 | service_cidr | CIDR IPv4 range to assign to Kubernetes services | "10.3.0.0/16" | "10.3.0.0/24" |
 | node_labels | List of initial node labels | [] | ["worker-pool=foo"] |
+| node_taints | List of initial node taints | [] | ["role=gpu:NoSchedule"] |
 
 Check the list of valid [machine types](https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/) and their [specs](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/sizes-general). Use `az vm list-skus` to get the identifier.
 
@@ -205,7 +207,7 @@ Create a cluster following the Google Cloud [tutorial](../flatcar-linux/google-c
 
     ```tf
     module "yavin-worker-pool" {
-      source = "git::https://github.com/poseidon/typhoon//google-cloud/fedora-coreos/kubernetes/workers?ref=v1.20.5"
+      source = "git::https://github.com/poseidon/typhoon//google-cloud/fedora-coreos/kubernetes/workers?ref=v1.21.2"
 
       # Google Cloud
       region       = "europe-west2"
@@ -229,7 +231,7 @@ Create a cluster following the Google Cloud [tutorial](../flatcar-linux/google-c
 
     ```tf
     module "yavin-worker-pool" {
-      source = "git::https://github.com/poseidon/typhoon//google-cloud/flatcar-linux/kubernetes/workers?ref=v1.20.5"
+      source = "git::https://github.com/poseidon/typhoon//google-cloud/flatcar-linux/kubernetes/workers?ref=v1.21.2"
 
       # Google Cloud
       region       = "europe-west2"
@@ -260,11 +262,11 @@ Verify a managed instance group of workers joins the cluster within a few minute
 ```
 $ kubectl get nodes
 NAME                                             STATUS   AGE    VERSION
-yavin-controller-0.c.example-com.internal        Ready    6m     v1.20.5
-yavin-worker-jrbf.c.example-com.internal         Ready    5m     v1.20.5
-yavin-worker-mzdm.c.example-com.internal         Ready    5m     v1.20.5
-yavin-16x-worker-jrbf.c.example-com.internal     Ready    3m     v1.20.5
-yavin-16x-worker-mzdm.c.example-com.internal     Ready    3m     v1.20.5
+yavin-controller-0.c.example-com.internal        Ready    6m     v1.21.2
+yavin-worker-jrbf.c.example-com.internal         Ready    5m     v1.21.2
+yavin-worker-mzdm.c.example-com.internal         Ready    5m     v1.21.2
+yavin-16x-worker-jrbf.c.example-com.internal     Ready    3m     v1.21.2
+yavin-16x-worker-mzdm.c.example-com.internal     Ready    3m     v1.21.2
 ```
 
 ### Variables
@@ -297,6 +299,7 @@ Check the list of regions [docs](https://cloud.google.com/compute/docs/regions-z
 | snippets | Container Linux Config snippets | [] | [examples](/advanced/customization/) |
 | service_cidr | Must match `service_cidr` of cluster | "10.3.0.0/16" | "10.3.0.0/24" |
 | node_labels | List of initial node labels | [] | ["worker-pool=foo"] |
+| node_taints | List of initial node taints | [] | ["role=gpu:NoSchedule"] |
 
 Check the list of valid [machine types](https://cloud.google.com/compute/docs/machine-types).
 
